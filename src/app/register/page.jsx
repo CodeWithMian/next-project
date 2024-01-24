@@ -1,20 +1,27 @@
 "use client";
 import InputComponent from "@/components/FormElements/InputComponent";
 import SelectComponent from "@/components/FormElements/SelectComponent";
+import ComponentLevelLoader from "@/components/Loader/componentlevel";
+import Notification from "@/components/Notification";
+import { GlobalContext } from "@/context";
 import { registerNewUser } from "@/services/register";
 import { registrationFormControls } from "@/utils";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const Register = () => {
-  const isRegistered = false;
+
   const initialFormData = {
     name: "",
     email: "",
     password: "",
     role: "customer",
   };
-
+const router = useRouter()
   const [formData, setFormData] = useState(initialFormData);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const { pageLevelLoader, setPageLevelLoader , isAuthUser } = useContext(GlobalContext);
   console.log(formData);
 
   function isFormValid() {
@@ -29,9 +36,23 @@ const Register = () => {
       : false;
   }
   async function handleRegisterOnSubmit(){
+    setPageLevelLoader(true)
 const data = await registerNewUser(formData)
+if(data.success){
+  toast.success(data.message)
+  setIsRegistered(true);
+  setPageLevelLoader(true)
+  setFormData(initialFormData);
+}else{
+  toast.error(data.message)
+  setPageLevelLoader(false)
+  setFormData(initialFormData)
+}
 console.log(data)
   }
+  useEffect(() => {
+    if (isAuthUser) router.push("/");
+  }, [isAuthUser]);
   return (
     <div className="bg-white relative">
       <div className="flex flex-col items-center justify-between pt-0 pr-10 pb-0 pl-10 mt-8 mr-auto xl:px-5 lg:flex-row">
@@ -48,6 +69,7 @@ console.log(data)
                   className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg 
                 text-white transition-all duration-200 ease-in-out focus:shadow font-medium uppercase tracking-wide
                 "
+                onClick={()=>router.push('/login')}
                 >
                   Login
                 </button>
@@ -88,7 +110,9 @@ console.log(data)
                     disabled={!isFormValid()}
                     onClick={handleRegisterOnSubmit}
                   >
-                    Register
+                    {
+                      pageLevelLoader ?(<ComponentLevelLoader text={'Registering'} color={'#ffffff'} loading={pageLevelLoader}/>):('Register')}
+                    
                   </button>
                 </div>
               )}
@@ -96,6 +120,7 @@ console.log(data)
           </div>
         </div>
       </div>
+      <Notification/>
     </div>
   );
 };

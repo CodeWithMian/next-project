@@ -1,11 +1,15 @@
 "use client";
 import InputComponent from "@/components/FormElements/InputComponent";
+import ComponentLevelLoader from "@/components/Loader/componentlevel";
+import Notification from "@/components/Notification";
 import { GlobalContext } from "@/context";
 import { login } from "@/services/login";
 import { loginFormControls } from "@/utils";
+import { data } from "autoprefixer";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const router = useRouter();
@@ -19,7 +23,9 @@ const Login = () => {
     isAuthUser,
     setIsAuthUser,
     user,
-    setUser,
+    setUser,  
+    componentLevelLoader,
+    setComponentLevelLoader,
   } = useContext(GlobalContext);
 
   function isValidForm() {
@@ -33,16 +39,22 @@ const Login = () => {
   }
 
   async function handleLogin(){
+    setComponentLevelLoader({loading:true,id:''})
     const res = await login(formData)
     console.log(res)
 
-    if(res.success){ setIsAuthUser(true);
+    if(res.success){ 
+      toast.success(res.message)
+      setIsAuthUser(true);
       setUser(res?.finalData?.user);
       setFormData(initialFormdata);
       Cookies.set("token", res?.finalData?.token);
       localStorage.setItem("user", JSON.stringify(res?.finalData?.user));
+    setComponentLevelLoader({loading:false,id:''})
     }else{
+      toast.error(res.message)
       setIsAuthUser(false)
+    setComponentLevelLoader({loading:false,id:''})
     }
   }
   console.log(isAuthUser,user)
@@ -84,7 +96,9 @@ const Login = () => {
                disabled={!isValidForm()}
                onClick={handleLogin}
                >
-                  Login
+                  {
+                    componentLevelLoader && componentLevelLoader.loading ? <ComponentLevelLoader text={'Login in'} color={'#ffffff'} loading={componentLevelLoader && componentLevelLoader.loading}/>:'Login'
+                  }
                 </button>
                 <div className="flex flex-col gap-2">
                   <p>New to Website ?</p>
@@ -102,6 +116,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <Notification/>
     </div>
   );
 };

@@ -3,14 +3,27 @@ import { GlobalContext } from "@/context";
 import { adminNavOptions, navOptions } from "@/utils";
 import React, { Fragment, useContext } from "react";
 import CommonModal from "./CommonModal";
+import Cookies from "js-cookie";
+import { usePathname, useRouter } from "next/navigation";
 const Navbar = () => {
-  const isAdminView = false;
-  const isAuthUser = true;
-  const user = {
-    rol: "admin",
-  };
+
+ const router = useRouter()
+  // const isAdminView = false;
+  
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
-  function NavItems({ isModalView = false }) {
+  const {user,isAuthUser,setIsAuthUser,setUser}=useContext(GlobalContext)
+// console.log(user,isAuthUser,'navbar')
+const PathName = usePathname()
+function handleLogout(){
+  setIsAuthUser(false)
+  setUser(null)
+  Cookies.remove('token')
+  localStorage.clear()
+  router.push('/')
+}
+const isAdminView = PathName.includes('admin-view')
+
+  function NavItems({ isModalView = false, isAdminView,router}) {
     return (
       <div
         className={`items-center justify-between w-full md:flex md:w-auto ${
@@ -28,6 +41,7 @@ const Navbar = () => {
                 <li
                   className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                   key={item.id}
+                  onClick={()=>router.push(item.path)}
                 >
                   {item.label}
                 </li>
@@ -36,6 +50,7 @@ const Navbar = () => {
                 <li
                   className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                   key={item.id}
+                  onClick={()=>router.push(item.path)}
                 >
                   {item.label}
                 </li>
@@ -48,7 +63,7 @@ const Navbar = () => {
     <div>
       <nav className="bg-white fixed w-full z-20 top-0 left-0 border-b border-gray-200">
         <div className="max-w-screenx-l flex flex-wrap items-center justify-between mx-auto p-4">
-          <div className="flex items-center cursor-pointer">
+          <div className="flex items-center cursor-pointer" onClick={()=>router.push('/')}>
             <span className="self-center text-2xl font-semibold whitespace-nowrap">
               E-Commerce
             </span>
@@ -72,12 +87,13 @@ const Navbar = () => {
                 </button>
               </Fragment>
             ) : null}
-            {user?.rol === "admin" ? (
+            {user?.role === "admin" ? (
               isAdminView ? (
                 <button
                   className={
                     "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                   }
+                onClick={()=>router.push('/')}
                 >
                   Client View
                 </button>
@@ -86,6 +102,7 @@ const Navbar = () => {
                   className={
                     "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                   }
+                onClick={()=>router.push('/admin-view')}
                 >
                   Admin View
                 </button>
@@ -96,7 +113,7 @@ const Navbar = () => {
                 className={
                   "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                 }
-              >
+              onClick={handleLogout}>
                 Logout
               </button>
             ) : (
@@ -104,7 +121,7 @@ const Navbar = () => {
                 className={
                   "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                 }
-              >
+              onClick={()=>router.push('/login')}>
                 Login
               </button>
             )}
@@ -132,12 +149,12 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
-          <NavItems />
+          <NavItems isAdminView={isAdminView} router={router}/>
         </div>
       </nav>
       <CommonModal
         showModalTitle={false}
-        mainContent={<NavItems isModalView={true} />}
+        mainContent={<NavItems router={router} isModalView={true} isAdminView={isAdminView}/>}
         show={showNavModal}
         setshow={setShowNavModal}
       />
