@@ -8,7 +8,7 @@ import {
   firebaseConfig,
   firebaseStorageURL,
 } from "@/utils";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
 import {
   getDownloadURL,
@@ -16,7 +16,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { addNewProduct } from "@/services/product";
+import { addNewProduct, updateAProduct } from "@/services/product";
 import { GlobalContext } from "@/context";
 import Notification from "@/components/Notification";
 import ComponentLevelLoader from "@/components/Loader/componentlevel";
@@ -24,7 +24,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 const AdminAddNewProduct = () => {
   const app = initializeApp(firebaseConfig);
-  const router = useRouter()
+  const router = useRouter();
   const storage = getStorage(app, firebaseStorageURL);
   const createUniqueFileName = (getFile) => {
     const timeStamp = Date.now();
@@ -83,7 +83,13 @@ const AdminAddNewProduct = () => {
   const {
     componentLevelLoader,
     setComponentLevelLoader,
+    currentUpdatedProduct,
+    setCurrentUpdatedProduct,
   } = useContext(GlobalContext);
+
+  useEffect(() => {
+    if (currentUpdatedProduct !== null) setFormData(currentUpdatedProduct);
+  }, [currentUpdatedProduct]);
   console.log(formData);
 
   function handleTileClick(getCurrentItem) {
@@ -105,7 +111,10 @@ const AdminAddNewProduct = () => {
 
   async function handleAddProduct() {
     setComponentLevelLoader({ loading: true, id: "" });
-    const res = await addNewProduct(formData);
+    const res =
+      currentUpdatedProduct !== null
+        ? await updateAProduct(formData)
+        : await addNewProduct(formData);
 
     if (res.success) {
       setComponentLevelLoader({ loading: false, id: "" });

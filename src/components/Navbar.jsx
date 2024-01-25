@@ -1,7 +1,7 @@
 "use client";
 import { GlobalContext } from "@/context";
 import { adminNavOptions, navOptions } from "@/utils";
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import CommonModal from "./CommonModal";
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,9 +11,19 @@ const Navbar = () => {
   // const isAdminView = false;
   
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
-  const {user,isAuthUser,setIsAuthUser,setUser}=useContext(GlobalContext)
+  const {user,isAuthUser,setIsAuthUser,setUser,currentUpdatedProduct, setCurrentUpdatedProduct}=useContext(GlobalContext)
 // console.log(user,isAuthUser,'navbar')
 const PathName = usePathname()
+
+useEffect(() => {// when ever user come back the form will be empty
+  if (
+    PathName !== "/admin-view/add-product" &&
+    currentUpdatedProduct !== null
+  )
+    setCurrentUpdatedProduct(null);
+}, [PathName]);
+
+
 function handleLogout(){
   setIsAuthUser(false)
   setUser(null)
