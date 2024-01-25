@@ -184,4 +184,16 @@ export const navOptions = [
       label: "L",
     },
   ];
+
+  export const firebaseConfig = {
+    apiKey: "AIzaSyBwEg20StyFt2Q0cKXE2n3EwxUZFRmOy5Y",
+    authDomain: "next-project-fbf0f.firebaseapp.com",
+    projectId: "next-project-fbf0f",
+    storageBucket: "next-project-fbf0f.appspot.com",
+    messagingSenderId: "108052661112",
+    appId: "1:108052661112:web:5354a6a9a83099672b3e8d",
+    measurementId: "G-L81Y8WNSKL"
+  };
+
+  export const firebaseStorageURL ='gs://next-project-fbf0f.appspot.com'
   

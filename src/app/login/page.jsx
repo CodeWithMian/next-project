@@ -23,7 +23,7 @@ const Login = () => {
     isAuthUser,
     setIsAuthUser,
     user,
-    setUser,  
+    setUser,
     componentLevelLoader,
     setComponentLevelLoader,
   } = useContext(GlobalContext);
@@ -38,26 +38,26 @@ const Login = () => {
       : false;
   }
 
-  async function handleLogin(){
-    setComponentLevelLoader({loading:true,id:''})
-    const res = await login(formData)
-    console.log(res)
+  async function handleLogin() {
+    setComponentLevelLoader({ loading: true, id: "" });
+    const res = await login(formData);
+    console.log(res);
 
-    if(res.success){ 
-      toast.success(res.message)
+    if (res.success) {
+      toast.success(res.message);
       setIsAuthUser(true);
       setUser(res?.finalData?.user);
       setFormData(initialFormdata);
       Cookies.set("token", res?.finalData?.token);
       localStorage.setItem("user", JSON.stringify(res?.finalData?.user));
-    setComponentLevelLoader({loading:false,id:''})
-    }else{
-      toast.error(res.message)
-      setIsAuthUser(false)
-    setComponentLevelLoader({loading:false,id:''})
+      setComponentLevelLoader({ loading: false, id: "" });
+    } else {
+      toast.error(res.message);
+      setIsAuthUser(false);
+      setComponentLevelLoader({ loading: false, id: "" });
     }
   }
-  console.log(isAuthUser,user)
+  console.log(isAuthUser, user);
 
   useEffect(() => {
     if (isAuthUser) router.push("/");
@@ -93,12 +93,20 @@ const Login = () => {
                   className="disabled:opacity-50 inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg 
                 text-white transition-all duration-200 ease-in-out focus:shadow font-medium uppercase tracking-wide
                 "
-               disabled={!isValidForm()}
-               onClick={handleLogin}
-               >
-                  {
-                    componentLevelLoader && componentLevelLoader.loading ? <ComponentLevelLoader text={'Login in'} color={'#ffffff'} loading={componentLevelLoader && componentLevelLoader.loading}/>:'Login'
-                  }
+                  disabled={!isValidForm()}
+                  onClick={handleLogin}
+                >
+                  {componentLevelLoader && componentLevelLoader.loading ? (
+                    <ComponentLevelLoader
+                      text={"Login in"}
+                      color={"#ffffff"}
+                      loading={
+                        componentLevelLoader && componentLevelLoader.loading
+                      }
+                    />
+                  ) : (
+                    "Login"
+                  )}
                 </button>
                 <div className="flex flex-col gap-2">
                   <p>New to Website ?</p>
@@ -116,7 +124,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <Notification/>
+      <Notification />
     </div>
   );
 };
