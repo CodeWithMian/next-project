@@ -5,35 +5,43 @@ import React, { Fragment, useContext, useEffect } from "react";
 import CommonModal from "./CommonModal";
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
+import CartModal from "./CartModal";
 const Navbar = () => {
-
- const router = useRouter()
+  const router = useRouter();
   // const isAdminView = false;
-  
+
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
-  const {user,isAuthUser,setIsAuthUser,setUser,currentUpdatedProduct, setCurrentUpdatedProduct}=useContext(GlobalContext)
-// console.log(user,isAuthUser,'navbar')
-const PathName = usePathname()
+  const {
+    user,
+    isAuthUser,
+    setIsAuthUser,
+    setUser,
+    currentUpdatedProduct,
+    setCurrentUpdatedProduct,
+    showCartModal
+  } = useContext(GlobalContext);
+  // console.log(user,isAuthUser,'navbar')
+  const PathName = usePathname();
 
-useEffect(() => {// when ever user come back the form will be empty
-  if (
-    PathName !== "/admin-view/add-product" &&
-    currentUpdatedProduct !== null
-  )
-    setCurrentUpdatedProduct(null);
-}, [PathName]);
+  useEffect(() => {
+    // when ever user come back the form will be empty
+    if (
+      PathName !== "/admin-view/add-product" &&
+      currentUpdatedProduct !== null
+    )
+      setCurrentUpdatedProduct(null);
+  }, [PathName]);
 
+  function handleLogout() {
+    setIsAuthUser(false);
+    setUser(null);
+    Cookies.remove("token");
+    localStorage.clear();
+    router.push("/");
+  }
+  const isAdminView = PathName.includes("admin-view");
 
-function handleLogout(){
-  setIsAuthUser(false)
-  setUser(null)
-  Cookies.remove('token')
-  localStorage.clear()
-  router.push('/')
-}
-const isAdminView = PathName.includes('admin-view')
-
-  function NavItems({ isModalView = false, isAdminView,router}) {
+  function NavItems({ isModalView = false, isAdminView, router }) {
     return (
       <div
         className={`items-center justify-between w-full md:flex md:w-auto ${
@@ -51,7 +59,7 @@ const isAdminView = PathName.includes('admin-view')
                 <li
                   className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                   key={item.id}
-                  onClick={()=>router.push(item.path)}
+                  onClick={() => router.push(item.path)}
                 >
                   {item.label}
                 </li>
@@ -60,7 +68,7 @@ const isAdminView = PathName.includes('admin-view')
                 <li
                   className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                   key={item.id}
-                  onClick={()=>router.push(item.path)}
+                  onClick={() => router.push(item.path)}
                 >
                   {item.label}
                 </li>
@@ -73,7 +81,10 @@ const isAdminView = PathName.includes('admin-view')
     <div>
       <nav className="bg-white fixed w-full z-20 top-0 left-0 border-b border-gray-200">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <div className="flex items-center cursor-pointer" onClick={()=>router.push('/')}>
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => router.push("/")}
+          >
             <span className="self-center text-2xl font-semibold whitespace-nowrap">
               E-Commerce
             </span>
@@ -103,7 +114,7 @@ const isAdminView = PathName.includes('admin-view')
                   className={
                     "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                   }
-                onClick={()=>router.push('/')}
+                  onClick={() => router.push("/")}
                 >
                   Client View
                 </button>
@@ -112,7 +123,7 @@ const isAdminView = PathName.includes('admin-view')
                   className={
                     "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                   }
-                onClick={()=>router.push('/admin-view')}
+                  onClick={() => router.push("/admin-view")}
                 >
                   Admin View
                 </button>
@@ -123,7 +134,8 @@ const isAdminView = PathName.includes('admin-view')
                 className={
                   "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                 }
-              onClick={handleLogout}>
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             ) : (
@@ -131,7 +143,8 @@ const isAdminView = PathName.includes('admin-view')
                 className={
                   "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                 }
-              onClick={()=>router.push('/login')}>
+                onClick={() => router.push("/login")}
+              >
                 Login
               </button>
             )}
@@ -159,15 +172,24 @@ const isAdminView = PathName.includes('admin-view')
               </svg>
             </button>
           </div>
-          <NavItems isAdminView={isAdminView} router={router}/>
+          <NavItems isAdminView={isAdminView} router={router} />
         </div>
       </nav>
       <CommonModal
         showModalTitle={false}
-        mainContent={<NavItems router={router} isModalView={true} isAdminView={isAdminView}/>}
+        mainContent={
+          <NavItems
+            router={router}
+            isModalView={true}
+            isAdminView={isAdminView}
+          />
+        }
         show={showNavModal}
         setshow={setShowNavModal}
       />
+      {
+        showCartModal && <CartModal/>
+      }
     </div>
   );
 };

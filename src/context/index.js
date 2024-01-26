@@ -10,6 +10,7 @@ export default function GlobalState({ children }) {
   const [pageLevelLoader, setPageLevelLoader] = useState(false);
   const [currentUpdatedProduct, setCurrentUpdatedProduct] = useState(null);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const [componentLevelLoader, setComponentLevelLoader] = useState({
     loading: false,
     id: "",
@@ -42,7 +43,9 @@ export default function GlobalState({ children }) {
         currentUpdatedProduct,
         setCurrentUpdatedProduct,
         showCartModal, 
-        setShowCartModal
+        setShowCartModal,
+        cartItems, 
+        setCartItems
       }}
     >
       {children}
