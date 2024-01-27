@@ -1,8 +1,36 @@
 "use client";
 
-// import Notification from "../Notification";
+import { GlobalContext } from "@/context";
+import { useContext } from "react";
+import { toast } from "react-toastify";
+import ComponentLevelLoader from "../Loader/componentlevel";
+import { addToCart } from "@/services/cart";
+import Notification from "../Notification";
 
 export default function CommonDetails({ item }) {
+  const {
+    setComponentLevelLoader,
+    componentLevelLoader,
+    user,
+    setShowCartModal,
+  } = useContext(GlobalContext);
+
+  async function handleAddToCart(getItem) {
+    setComponentLevelLoader({ loading: true, id: "" });
+
+    const res = await addToCart({ productID: getItem._id, userID: user._id });
+
+    if (res.success) {
+      toast.success(res.message);
+      setComponentLevelLoader({ loading: false, id: "" });
+      setShowCartModal(true);
+    } else {
+      toast.error(res.message);
+      setComponentLevelLoader({ loading: false, id: "" });
+      setShowCartModal(true);
+    }
+  }
+
   return (
     <section className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto px-4">
@@ -66,8 +94,20 @@ export default function CommonDetails({ item }) {
               </div>
               <button
                 type="button"
+                onClick={() => handleAddToCart(item)}
                 className="mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium tracking-wide uppercase text-white"
-              >Add To Cart
+              >
+                {componentLevelLoader && componentLevelLoader.loading ? (
+                  <ComponentLevelLoader
+                    text={"Adding to Cart"}
+                    color={"#ffffff"}
+                    loading={
+                      componentLevelLoader && componentLevelLoader.loading
+                    }
+                  />
+                ) : (
+                  "Add to Cart"
+                )}
               </button>
             </div>
             <ul className="mt-8 space-y-2">
@@ -96,7 +136,7 @@ export default function CommonDetails({ item }) {
           </div>
         </div>
       </div>
-      {/* <Notification/> */}
+      <Notification/>
     </section>
   );
 }

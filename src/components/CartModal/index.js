@@ -2,9 +2,12 @@
 import { Fragment, useContext, useEffect } from "react";
 import CommonModal from "../CommonModal";
 import { GlobalContext } from "@/context";
-import { getAllCartItems } from "@/services/cart";
+import { deleteFromCart, getAllCartItems } from "@/services/cart";
+import { toast } from "react-toastify";
+import ComponentLevelLoader from "../Loader/componentlevel";
+import { useRouter } from "next/navigation";
 export default function CartModal() {
-  const { showCartModal, setShowCartModal, user, cartItems, setCartItems } =
+  const { showCartModal, setShowCartModal, user, cartItems, setCartItems,componentLevelLoader,setComponentLevelLoader } =
     useContext(GlobalContext);
 
   async function extractAllCartItems() {
@@ -19,6 +22,23 @@ export default function CartModal() {
   useEffect(() => {
     if (user !== null) extractAllCartItems();
   }, [user]);
+
+  async function handleDeleteCartItem(getCartItemID) {
+    setComponentLevelLoader({ loading: true, id: getCartItemID });
+    const res = await deleteFromCart(getCartItemID);
+
+    if (res.success) {
+      setComponentLevelLoader({ loading: false, id: "" });
+      toast.success(res.message);
+
+      extractAllCartItems();
+    } else {
+      toast.error(res.message);
+      setComponentLevelLoader({ loading: false, id: getCartItemID });
+    }
+  }
+
+  const router = useRouter()
   return (
     <CommonModal
       showButtons={true}
@@ -62,8 +82,21 @@ export default function CartModal() {
                     <button
                       type="button"
                       className="font-medium text-yellow-600 sm:order-2"
+                      onClick={() => handleDeleteCartItem(cartItem._id)}
                     >
-                      Remove
+                      {componentLevelLoader &&
+                      componentLevelLoader.loading &&
+                      componentLevelLoader.id === cartItem._id ? (
+                        <ComponentLevelLoader
+                          text={"Removing"}
+                          color={"#000000"}
+                          loading={
+                            componentLevelLoader && componentLevelLoader.loading
+                          }
+                        />
+                      ) : (
+                        "Remove"
+                      )}
                     </button>
                   </div>
                 </div>
@@ -75,6 +108,10 @@ export default function CartModal() {
       buttonComponent={
         <Fragment>
           <button
+          onClick={() => {
+            router.push("/cart");
+            setShowCartModal(false);
+          }}
             type="button"
             className="mt-1.5 w-full inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase tracking-wide"
           >
@@ -87,7 +124,6 @@ export default function CartModal() {
               router.push("/checkout");
               setShowCartModal(false);
             }}
-            
             className="disabled:opacity-50 mt-1.5 w-full inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase tracking-wide"
           >
             Checkout

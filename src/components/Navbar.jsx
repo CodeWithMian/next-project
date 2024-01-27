@@ -100,6 +100,7 @@ const Navbar = () => {
                   Account
                 </button>
                 <button
+                onClick={()=>router.push('/cart')}
                   className={
                     "mt-1.5 bg-black text-white inline-block px-5 py-3 uppercase text-xs tracking-wide font-medium"
                   }
