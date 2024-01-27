@@ -58,9 +58,7 @@ const Account = () => {
     
         if (res.success) {
           setComponentLevelLoader({ loading: false, id: "" });
-          toast.success(res.message, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          toast.success(res.message);
           setAddressFormData({
             fullName: "",
             city: "",
@@ -72,9 +70,7 @@ const Account = () => {
           setCurrentEditedAddressId(null);
         } else {
           setComponentLevelLoader({ loading: false, id: "" });
-          toast.error(res.message, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          toast.error(res.message);
           setAddressFormData({
             fullName: "",
             city: "",
