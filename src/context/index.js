@@ -17,6 +17,14 @@ export default function GlobalState({ children }) {
   });
   const [isAuthUser, setIsAuthUser] = useState(null);
   const [user, setUser] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [addressFormData, setAddressFormData] = useState({
+    fullName: "",
+    city: "",
+    country: "",
+    postalCode: "",
+    address: "",
+  });
   useEffect(()=>{
     // console.log(Cookies.get('token'))
     if(Cookies.get('token')!==undefined){
@@ -45,7 +53,9 @@ export default function GlobalState({ children }) {
         showCartModal, 
         setShowCartModal,
         cartItems, 
-        setCartItems
+        setCartItems,
+        addresses,setAddresses,
+        addressFormData,setAddressFormData
       }}
     >
       {children}
