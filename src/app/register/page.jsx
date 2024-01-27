@@ -36,7 +36,6 @@ const router = useRouter()
       : false;
   }
   async function handleRegisterOnSubmit(){
-    setPageLevelLoader(true)
 const data = await registerNewUser(formData)
 if(data.success){
   toast.success(data.message)
