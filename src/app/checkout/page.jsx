@@ -3,14 +3,26 @@
 import Notification from '@/components/Notification'
 import { GlobalContext } from '@/context'
 import { fetchAllAddresses } from '@/services/address'
-import { useRouter } from 'next/navigation'
-import React, { useContext } from 'react'
+import { callStripeSession } from '@/services/stripe'
+import { loadStripe } from '@stripe/stripe-js'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useContext, useEffect, useState } from 'react'
 
 const Checkout = () => {
     const router = useRouter()
     const {checkoutFormData,setCheckoutFormData,cartItems,user,addresses,setAddresses}= useContext(GlobalContext)
     const [selectedAddress, setSelectedAddress] = useState(null);
     // console.log(cartItems)
+
+    const [isOrderProcessing, setIsOrderProcessing] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState(false);
+  
+    
+    const params = useSearchParams();
+  
+    const publishableKey =
+      "pk_test_51OdJ8gJCt4TuEQYMEcBl2N4t0YhtecrxTP6gKlNfZc130FQqhxdA7OWcFpvE48B5F1OPkQZ3KMdQQ7S78BFGLdQX00qRUKTW41";
+    const stripePromise = loadStripe(publishableKey);
 
     async function getAllAddresses() {
         const res = await fetchAllAddresses(user?._id);
@@ -48,6 +60,34 @@ const Checkout = () => {
           },
         });
       }
+      async function handleCheckout() {
+        const stripe = await stripePromise;
+    
+        const createLineItems = cartItems.map((item) => ({
+          price_data: {
+            currency: "usd",
+            product_data: {
+              images: [item.productID.imageUrl],
+              name: item.productID.name,
+            },
+            unit_amount: item.productID.price * 100,
+          },
+          quantity: 1,
+        }));
+    
+        const res = await callStripeSession(createLineItems);
+        setIsOrderProcessing(true);
+        localStorage.setItem("stripe", true);
+        localStorage.setItem("checkoutFormData", JSON.stringify(checkoutFormData));
+    
+        const { error } = await stripe.redirectToCheckout({
+          sessionId: res.id,
+        });
+    
+        console.log(error);
+      }
+    
+      console.log(checkoutFormData);
   return (
     <div>
       <div className="grid sm:px-10 lg:grid-cols-2 lg:px-20 xl:px-32">
