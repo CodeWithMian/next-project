@@ -4,6 +4,14 @@ import Cookies from "js-cookie";
 import { createContext, useEffect, useState } from "react";
 
 export const GlobalContext = createContext(null);
+export const initialCheckoutFormData = {
+  shippingAddress: {},
+  paymentMethod: "",
+  totalPrice: 0,
+  isPaid: false,
+  paidAt: new Date(),
+  isProcessing: true,
+};
 
 export default function GlobalState({ children }) {
   const [showNavModal, setShowNavModal] = useState(false);
@@ -25,12 +33,17 @@ export default function GlobalState({ children }) {
     postalCode: "",
     address: "",
   });
+  const [checkoutFormData, setCheckoutFormData] = useState(
+    initialCheckoutFormData
+  );
   useEffect(()=>{
     // console.log(Cookies.get('token'))
     if(Cookies.get('token')!==undefined){
         setIsAuthUser(true)
         const userData = JSON.parse(localStorage.getItem("user")) || {};
+        const getCartItems = JSON.parse(localStorage.getItem('cartItems'))||[]
         setUser(userData)
+        setCartItems(getCartItems)
     }else{
         setIsAuthUser(false)
     }
@@ -55,7 +68,8 @@ export default function GlobalState({ children }) {
         cartItems, 
         setCartItems,
         addresses,setAddresses,
-        addressFormData,setAddressFormData
+        addressFormData,setAddressFormData,
+        checkoutFormData,setCheckoutFormData
       }}
     >
       {children}
