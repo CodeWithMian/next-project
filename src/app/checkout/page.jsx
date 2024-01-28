@@ -28,7 +28,7 @@ const Checkout = () => {
       const params = useSearchParams();
     
       const publishableKey =
-        "pk_test_51OdJ8gJCt4TuEQYMEcBl2N4t0YhtecrxTP6gKlNfZc130FQqhxdA7OWcFpvE48B5F1OPkQZ3KMdQQ7S78BFGLdQX00qRUKTW41";
+        "";
       const stripePromise = loadStripe(publishableKey);
     
       console.log(cartItems);
